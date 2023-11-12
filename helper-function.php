@@ -153,24 +153,25 @@ function dd($data)
     $content = ob_get_contents();
     ob_end_clean();
 
-    $content = preg_replace("/\r\n|\r/", "\n", $content);
+    $content = preg_replace("#\r\n|\r#", "\n", $content);
     $content = str_replace("]=>\n", '] = ', $content);
     $content = preg_replace('/= {2,}/', '= ', $content);
-    $content = preg_replace("/\[\"(.*?)\"\] = /i", "[$1] = ", $content);
+    $content = preg_replace("#\[\"(.*?)\"\] = #i", "[$1] = ", $content);
     $content = preg_replace('/  /', "    ", $content);
-    $content = preg_replace("/\"\"(.*?)\"/i", "\"$1\"", $content);
-    $content = preg_replace("/(int|float)\(([0-9\.]+)\)/i", "$1() <span class=\"number\">$2</span>", $content);
-    $content = preg_replace("/(\[[\w ]+\] = string\([0-9]+\) )\"(.*?)/sim", "$1<span class=\"string\">\"", $content);
-    $content = preg_replace("/(\"\n{1,})( {0,}\})/sim", "$1</span>$2", $content);
-    $content = preg_replace("/(\"\n{1,})( {0,}\[)/sim", "$1</span>$2", $content);
-    $content = preg_replace("/(string\([0-9]+\) )\"(.*?)\"\n/sim", "$1<span class=\"string\">\"$2\"</span>\n", $content);
+    $content = preg_replace("#\"\"(.*?)\"#i", "\"$1\"", $content);
+    $content = preg_replace("#(int|float)\(([0-9\.]+)\)#i", "$1() <span class=\"number\">$2</span>", $content);
+    $content = preg_replace("#(\[[\w ]+\] = string\([0-9]+\) )\"(.*?)#sim", "$1<span class=\"string\">\"$2\"", $content);
+    $content = preg_replace("#(\"\n{1,})( {0,}\})#sim", "$1</span>$2", $content);
+    $content = preg_replace("#(\"\n{1,})( {0,}\[)#sim", "$1</span>$2", $content);
+    $content = preg_replace("#(string\([0-9]+\) )\"(.*?)\"\n#sim", "$1<span class=\"string\">\"$2\"</span>\n", $content);
+
     $regex = array(
-        'numbers' => array('/(^|] = )(array|float|int|string|resource|object\(.*\)|\&amp;object\(.*\))\(([0-9\.]+)\)/i', '$1$2(<span class="number">$3</span>)'),
-        'null' => array('/(^|] = )(null)/i', '$1<span class="keyword">$2</span>'),
-        'bool' => array('/(bool)\((true|false)\)/i', '$1(<span class="keyword">$2</span>)'),
-        'types' => array('/(of type )\((.*)\)/i', '$1(<span class="type">$2</span>)'),
-        'object' => array('/(object|\&amp;object)\(([\w]+)\)/i', '$1(<span class="object">$2</span>)'),
-        'function' => array('/(^|] = )(array|string|int|float|bool|resource|object|\&amp;object)\(/i', '$1<span class="function">$2</span>('),
+        'numbers' => array('#(^|] = )(array|float|int|string|resource|object\(.*\)|\&amp;object\(.*\))\(([0-9\.]+)\)#i', '$1$2(<span class="number">$3</span>)'),
+        'null' => array('#(^|] = )(null)#i', '$1<span class="keyword">$2</span>'),
+        'bool' => array('#(bool)\((true|false)\)#i', '$1(<span class="keyword">$2</span>)'),
+        'types' => array('#(of type )\((.*)\)#i', '$1(<span class="type">$2</span>)'),
+        'object' => array('#(object|\&amp;object)\(([\w]+)\)#i', '$1(<span class="object">$2</span>)'),
+        'function' => array('#(^|] = )(array|string|int|float|bool|resource|object|\&amp;object)\(#i', '$1<span class="function">$2</span>('),
     );
 
     foreach ($regex as $x) {
@@ -213,15 +214,15 @@ function dd($data)
     .dumpr span.type {color: #0072c4;}
     ";
 
-    $style = preg_replace("/ {2,}/", "", $style);
-    $style = preg_replace("/\t|\r\n|\r|\n", "", $style);
-    $style = preg_replace("/\/\*.*?\*\//i", '', $style);
+    $style = preg_replace("# {2,}#", "", $style);
+    $style = preg_replace("#\t|\r\n|\r|\n#", "", $style);
+    $style = preg_replace("#/\*.*?\*/#i", '', $style);
     $style = str_replace('}', '} ', $style);
     $style = str_replace(' {', '{', $style);
     $style = trim($style);
 
     $content = trim($content);
-    $content = preg_replace("/\n<\/span>/", "</span>\n", $content);
+    $content = preg_replace("#\n<\/span>#", "</span>\n", $content);
 
     $out = "\n\n" .
         "<style type=\"text/css\">" . $style . "</style>\n" .

@@ -273,3 +273,10 @@ function get_cookie($index)
     if (isset($_COOKIE[$index])) return trim($_COOKIE[$index]);
     else return false;
 }
+
+function abort($code = 404): void
+{
+    include "error/{$code}.php";
+    http_response_code($code);
+    die();
+}

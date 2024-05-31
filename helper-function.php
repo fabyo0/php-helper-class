@@ -1,5 +1,6 @@
 <?php
 
+use JetBrains\PhpStorm\NoReturn;
 
 /**
  * Turkish language slug builder.
@@ -102,6 +103,24 @@ function lower(string $value): string
     return mb_strtolower($value, 'UTF-8');
 }
 
+function camelCase(string $value): string
+{
+    $value = ucwords(str_replace(['-', '_'], ' ', $value));
+    return lcfirst(str_replace(' ', '', $value));
+}
+
+/**
+ * Convert a string to snake_case.
+ *
+ * @param string $value
+ * @return string
+ */
+function snakeCase(string $value): string
+{
+    $value = preg_replace('/\s+/u', '', ucwords($value));
+    return strtolower(preg_replace('/(.)(?=[A-Z])/u', '$1_', $value));
+}
+
 /**
  * String append word & words.
  * @param $value
@@ -117,7 +136,7 @@ function append($value, ...$values): string
  * Get client IP information.
  * @return mixed
  */
-function getIpAddress()
+function getIpAddress(): mixed
 {
     if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
         $_SERVER['REMOTE_ADDR'] = $_SERVER["HTTP_CF_CONNECTING_IP"];
@@ -142,7 +161,7 @@ function getIpAddress()
  * @param $data
  * @return void
  */
-function dd($data)
+#[NoReturn] function dd($data)
 {
     $debug = debug_backtrace();
     $callingFile = $debug[0]['file'];
@@ -236,12 +255,12 @@ function dd($data)
     exit;
 }
 
-function add_session($index, $value)
+function addSession($index, $value): void
 {
     $_SESSION[$index] = $value;
 }
 
-function get_session($index)
+function getSession($index)
 {
     if (isset($_SESSION[$index])) {
         return $_SESSION[$index];
@@ -249,14 +268,14 @@ function get_session($index)
     return false;
 }
 
-function filter($field)
+function filter($field): array|string
 {
     return is_array($field)
         ? array_map('filter', $field)
         : htmlspecialchars(trim($field));
 }
 
-function post($index)
+function post($index): false|array|string
 {
     if (isset($_POST[$index])) return filter($_POST[$index]);
     else return false;
@@ -268,15 +287,89 @@ function get($index)
     else return false;
 }
 
-function get_cookie($index)
+/**
+ * Escape HTML entities in a string.
+ *
+ * @param string $value
+ * @return string
+ */
+function e(string $value): string
+{
+    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8', false);
+}
+
+function getCookie($index): false|string
 {
     if (isset($_COOKIE[$index])) return trim($_COOKIE[$index]);
     else return false;
 }
 
-function abort($code = 404): void
+#[NoReturn] function abort($code = 404): void
 {
     include "error/{$code}.php";
     http_response_code($code);
     die();
+}
+
+/**
+ * Get the file extension from a filename.
+ *
+ * @param string $filename
+ * @return string
+ */
+function getFileExtension(string $filename): string
+{
+    return pathinfo($filename, PATHINFO_EXTENSION);
+}
+
+/**
+ * Generate a UUID.
+ *
+ * @return string
+ * @throws Exception
+ */
+function generateUuid(): string
+{
+    $data = random_bytes(16);
+    $data[6] = chr((ord($data[6]) & 0x0f) | 0x40); // set version to 0100
+    $data[8] = chr((ord($data[8]) & 0x3f) | 0x80); // set variant to 10
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+}
+
+/**
+ * Sanitize a URL.
+ *
+ * @param string $url
+ * @return string|false
+ */
+function sanitizeUrl(string $url): string|false
+{
+    $url = filter_var(trim($url), FILTER_SANITIZE_URL);
+    return filter_var($url, FILTER_VALIDATE_URL) ? $url : false;
+}
+
+/**
+ * Format a date to a given format.
+ *
+ * @param string $date
+ * @param string $format
+ * @return string
+ */
+function formatDate(string $date, string $format = 'Y-m-d'): string
+{
+    $dateTime = new DateTime($date);
+    return $dateTime->format($format);
+}
+
+/**
+ * Validate a date string.
+ *
+ * @param string $date
+ * @param string $format
+ * @return bool
+ */
+function validateDate(string $date, string $format = 'Y-m-d'): bool
+{
+    $dateTime = DateTime::createFromFormat($format, $date);
+    return $dateTime && $dateTime->format($format) === $date;
 }

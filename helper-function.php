@@ -179,7 +179,7 @@ if (!function_exists('getIpAddress')) {
 
 
 if (!function_exists('dump')) {
-    function dump($data)
+    function dump(...$data)
     {
         $debug = debug_backtrace();
         $callingFile = $debug[0]['file'];
@@ -272,7 +272,7 @@ if (!function_exists('dump')) {
 }
 
 if (!function_exists('dd')) {
-    #[NoReturn] function dd($data)
+    #[NoReturn] function dd(...$data)
     {
         dump($data);
         exit;

@@ -186,7 +186,9 @@ if (!function_exists('dump')) {
         $callingFileLine = $debug[0]['line'];
 
         ob_start();
-        var_dump($data);
+        foreach ($data as $item) {
+            var_dump($item);
+        }
         $content = ob_get_contents();
         ob_end_clean();
 
@@ -272,13 +274,12 @@ if (!function_exists('dump')) {
 }
 
 if (!function_exists('dd')) {
-    #[NoReturn] function dd(...$data)
+    #[NoReturn] function dd(...$data): void
     {
-        dump($data);
+        dump(...$data);
         exit;
     }
 }
-
 
 
 if (!function_exists('addSession')) {
